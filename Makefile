@@ -68,6 +68,7 @@ OBJCOPY		:= $(GCCPREFIX)objcopy
 DD		:= $(GCCPREFIX)dd
 NM		:= $(GCCPREFIX)nm
 CSCOPE		:= cscope
+GDB     := $(GCCPREFIX)gdb
 
 # others
 GCC_LIB32 := $(shell $(CC) $(CFLAGS) -m32 -print-libgcc-file-name)
@@ -143,6 +144,9 @@ qemu-nox-gdb: $(CERTIKOS_IMG) pre-qemu
 	@echo "*** Now run 'gdb'." 1>&2
 	@echo "***"
 	$(V)$(QEMU) -nographic $(QEMUOPTS) -S
+
+gdb: pre-qemu
+	$(GDB)
 
 qemu-kvm: $(CERTIKOS_IMG)
 	$(V)$(QEMU) $(QEMUOPTS) $(QEMUOPTS_KVM)

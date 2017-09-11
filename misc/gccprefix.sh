@@ -5,12 +5,15 @@
 # We look for the following toolchains, in decreasing preference order:
 #
 #	1. pios-*	(pios-gcc, pios-ld, etc.)
+#	2. i686-elf-* (binary with h/w optimization)
 #	2. i386-elf-*	(i386-elf-gcc, i386-elf-ld, etc.)
 #	3. no prefix	ONLY if the system default GCC supports elf32-i386
 #
 
 if pios-objdump -i 2>&1 | grep '^elf32-i386$' >/dev/null 2>&1; then
 	echo 'pios-'
+elif i686-elf-objdump -i 2>&1 | grep '^elf32-i386$' >/dev/null 2>&1; then
+	echo 'i686-elf-'
 elif i386-elf-objdump -i 2>&1 | grep '^elf32-i386$' >/dev/null 2>&1; then
 	echo 'i386-elf-'
 elif objdump -i 2>&1 | grep 'elf32-i386' >/dev/null 2>&1; then
