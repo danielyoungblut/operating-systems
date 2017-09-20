@@ -28,6 +28,10 @@ ifndef GCCPREFIX
 GCCPREFIX := $(shell sh misc/gccprefix.sh)
 endif
 
+ifndef CCACHE
+CCACHE := $(shell sh misc/ccacheprefix.sh)
+endif
+
 # Directories
 TOP		:= .
 SRCDIR		:= $(TOP)
@@ -37,8 +41,8 @@ TESTDIR		:= $(TOP)/test
 OBJDIRS		:=
 
 # Compiler and Linker
-CC		:= $(GCCPREFIX)gcc
-LD		:= $(GCCPREFIX)ld
+CC		:=  $(CCACHE) $(GCCPREFIX)gcc
+LD		:= $(CCACHE) $(GCCPREFIX)ld
 CFLAGS		:= -MD -Wno-strict-aliasing -Wno-unused-function -pipe -fno-builtin -nostdinc -fno-stack-protector
 LDFLAGS		:= -nostdlib
 
@@ -96,10 +100,10 @@ QEMUOPTS_BIOS	:= -L $(UTILSDIR)/qemu/
 
 # Targets
 
-.PHONY: all boot kern deps qemu qemu-nox qemu-gdb
+.PHONY: all boot kern user deps qemu qemu-nox qemu-gdb user_lib user_procs
 
 
-all: boot kern
+all: boot kern user link
 	@./make_image.py
 ifdef TEST
 	@echo "***"
@@ -135,13 +139,13 @@ qemu-nox: $(CERTIKOS_IMG) pre-qemu
 
 qemu-gdb: $(CERTIKOS_IMG) pre-qemu
 	@echo "***"
-	@echo "*** Now run 'gdb'." 1>&2
+	@echo "*** Now run 'make gdb'." 1>&2
 	@echo "***"
 	$(V)$(QEMU) $(QEMUOPTS) -S
 
 qemu-nox-gdb: $(CERTIKOS_IMG) pre-qemu
 	@echo "***"
-	@echo "*** Now run 'gdb'." 1>&2
+	@echo "*** Now run 'make gdb'." 1>&2
 	@echo "***"
 	$(V)$(QEMU) -nographic $(QEMUOPTS) -S
 
@@ -166,8 +170,12 @@ cscope:
 	$(V)find . -name "*.[chsS]" > cscope.files
 	$(V)cscope -bkq -i cscope.files
 
+user: user_lib user_procs gen
+
+
 # Sub-makefiles
 include boot/Makefile.inc
+include user/Makefile.inc
 include kern/Makefile.inc
 
 deps: $(OBJDIR)/.deps
