@@ -27,22 +27,29 @@ unsigned int IDPTbl[1024][1024] gcc_aligned(PAGESIZE);
 // sets the CR3 register with the start address of the page structure for process # [index]
 void set_pdir_base(unsigned int index)
 {
-    // TODO
+    // TODO done
+    // from import.h, use set_cr3() function
+    set_cr3(PDirPool[index]);
+    
 }
 
 // returns the page directory entry # [pde_index] of the process # [proc_index]
 // this can be used to test whether the page directory entry is mapped
 unsigned int get_pdir_entry(unsigned int proc_index, unsigned int pde_index)
 {
-    // TODO
-    return 0;
+    // TODO done
+    //dprintf("%u\n", PDirPool[proc_index][pde_index]);
+    return PDirPool[proc_index][pde_index];
 }   
 
 // sets specified page directory entry with the start address of physical page # [page_index].
 // you should also set the permissions PTE_P, PTE_W, and PTE_U
 void set_pdir_entry(unsigned int proc_index, unsigned int pde_index, unsigned int page_index)
 {
-    // TODO
+    // TODO done
+    page_index = page_index << 12;
+    page_index |= PT_PERM_PTU;
+    PDirPool[proc_index][pde_index] = page_index;
 }   
 
 // sets the page directory entry # [pde_index] for the process # [proc_index]
@@ -50,15 +57,17 @@ void set_pdir_entry(unsigned int proc_index, unsigned int pde_index, unsigned in
 // you should also set the permissions PTE_P, PTE_W, and PTE_U
 // this will be used to map the page directory entry to identity page table.
 void set_pdir_entry_identity(unsigned int proc_index, unsigned int pde_index)
-{   
-    // TODO
+{    
+    // TODO done
+    PDirPool[proc_index][pde_index] = (unsigned int)IDPTbl[pde_index] | PT_PERM_PTU;
 }   
 
 // removes specified page directory entry (set the page directory entry to 0).
 // don't forget to cast the value to (char *).
 void rmv_pdir_entry(unsigned int proc_index, unsigned int pde_index)
 {
-    // TODO
+    // TODO done
+    PDirPool[proc_index][pde_index] = (char *)0;
 }   
 
 // returns the specified page table entry.
@@ -66,7 +75,6 @@ void rmv_pdir_entry(unsigned int proc_index, unsigned int pde_index)
 unsigned int get_ptbl_entry(unsigned int proc_index, unsigned int pde_index, unsigned int pte_index)
 {   
     // TODO
-    return 0;
 }
 
 // sets specified page table entry with the start address of physical page # [page_index]
